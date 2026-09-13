@@ -14,15 +14,16 @@ def create_tables():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS detections (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            filename TEXT NOT NULL,
-            species TEXT
+            species TEXT,
+            filename TEXT NOT NULL
+            
         )
     """)
     conn.commit()
     conn.close()
 
 # this is for testing if the table is corretly made
-```
+
 #def test_database():
 #    conn = get_connection()
  #   cursor = conn.cursor()
@@ -39,5 +40,4 @@ def create_tables():
 
 if __name__ == "__main__":
     create_tables()
-    test_database()
   
