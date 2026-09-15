@@ -10,12 +10,12 @@ def get_connection():
 def create_tables():
     conn = get_connection()
     cursor = conn.cursor()
-
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS detections (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             species TEXT,
-            filename TEXT NOT NULL
+            filename TEXT NOT NULL,
+            Confidence integer
             
         )
     """)
