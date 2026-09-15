@@ -5,10 +5,13 @@ import functions
 st.title ("ImmersaVLM")
 # grab what species of animal they want to filter from the database
     # this can be done by either A: going through and outputing allt he unique species in the table or B have a running dictionary of them and pull from that
-user_selected_s = st.multiselect("species to filter by :",[ "dogs","cats","fish","cars"])
+user_selected_s = st.multiselect("species to filter by :",[ "Dolphin","Whale","Fish","Otter"])
 user_selected_c = st.slider ("what is minumum confidance level:", min_value=00, max_value=100 , value=0 , step=10, format="%d%%")
 
-# call filter function if any of this was changed 
+# button to test data 
+if st.button("test data"): functions.add_demo_data()
+
+
 
 
 
@@ -16,11 +19,15 @@ user_selected_c = st.slider ("what is minumum confidance level:", min_value=00, 
 st.subheader("table")
 
 # create varible for all results, this varible can change later to when filter is added and allows for differnt changes
-results = functions.get_all_results()
+if user_selected_s or user_selected_c > 0:  
+     results= functions.results_by_filter(user_selected_s, user_selected_c)
+else:
+     results = functions.get_all_results()
 
+     
 tf = pd.DataFrame(
     results,
-    columns=["ID","Species","Filename"]
+    columns=["ID","Species","Filename","Confidence"]
 )
 # set up for generate reports function later on. #TODO ADD FUNCTIONALTY TO HAVE IT CREATE A PDF WITH ALL THE EXPECTED QUALITES
 tf["Generate report"] = "Generate Report"
@@ -37,7 +44,13 @@ start_idx = (current_page - 1) * ROWS_PER_PAGE
 end_idx = start_idx + ROWS_PER_PAGE
 sliced_tf = tf.iloc[start_idx:end_idx]
 
-st.dataframe(sliced_tf, use_container_width=True, hide_index=True, height=565)
+st.dataframe(sliced_tf, width='stretch', hide_index=True, height=565)
 
+st.write(user_selected_s)
+st.write(type(user_selected_s))
 
+if user_selected_s or user_selected_c > 0:  
+     results= functions.results_by_filter(user_selected_s, user_selected_c)
+else:
+     results = functions.get_all_results()
 
