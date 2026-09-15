@@ -49,7 +49,51 @@ def delete_result(detection_id):
 
 
 # TODO create filter based on qualites 
-def results_by_filter():
+def results_by_filter(Q1,Q2):
+    conn = database.get_connection()
+    cursor = conn.cursor() 
+    if not Q1:
+         cursor.execute("""
+            SELECT * FROM detections
+            WHERE confidence >= ?
+        """, (Q2,))
+    else:
+        placeholders = ",".join("?" for _ in Q1)
+        query = f"""SELECT * FROM detections where species IN ({placeholders}) AND confidence >= ?"""
+
+        cursor.execute(query,(*Q1,Q2))
+
+    results = cursor.fetchall()
+    conn.close()
+
+    return results
+
+def add_demo_data():
     conn = database.get_connection()
     cursor = conn.cursor()
-    
+
+    demo_data = [
+        ("Dolphin", "dolphin001.wav", 95),
+        ("Dolphin", "dolphin002.wav", 82),
+        ("Dolphin", "dolphin003.wav", 67),
+        ("Whale", "whale001.wav", 91),
+        ("Whale", "whale002.wav", 76),
+        ("Whale", "whale003.wav", 54),
+        ("Fish", "fish001.wav", 88),
+        ("Fish", "fish002.wav", 72),
+        ("Fish", "fish003.wav", 43),
+        ("Otter", "otter001.wav", 96),
+        ("Otter", "otter002.wav", 81),
+        ("Otter", "otter003.wav", 62),
+        ("Dolphin", "dolphin004.wav", 74),
+        ("Whale", "whale004.wav", 69),
+        ("Fish", "fish004.wav", 97)
+    ]
+
+    cursor.executemany("""
+        INSERT INTO detections (species, filename, Confidence)
+        VALUES (?, ?, ?)
+    """, demo_data)
+
+    conn.commit()
+    conn.close()
