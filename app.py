@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import math
 import functions 
+import reports
 st.title ("ImmersaVLM")
 # grab what species of animal they want to filter from the database
     # this can be done by either A: going through and outputing allt he unique species in the table or B have a running dictionary of them and pull from that
@@ -11,9 +12,9 @@ user_selected_c = st.slider ("what is minumum confidance level:", min_value=00, 
 # button to test data 
 if st.button("test data"): functions.add_demo_data()
 
+if st.button("test report"): reports.generate_report(1)
 
-
-
+if st.button("reset"): functions.clear_database()
 
 # create talbe header
 st.subheader("table")
@@ -46,11 +47,11 @@ sliced_tf = tf.iloc[start_idx:end_idx]
 
 st.dataframe(sliced_tf, width='stretch', hide_index=True, height=565)
 
-st.write(user_selected_s)
-st.write(type(user_selected_s))
 
-if user_selected_s or user_selected_c > 0:  
-     results= functions.results_by_filter(user_selected_s, user_selected_c)
-else:
-     results = functions.get_all_results()
+
+##if user_selected_s or user_selected_c > 0:  
+ #    results= functions.results_by_filter(user_selected_s, user_selected_c)
+#else:
+ #    results = functions.get_all_results()
+
 
