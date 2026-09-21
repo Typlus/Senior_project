@@ -22,7 +22,16 @@ def get_result_by_id(detection_id): # get one result from the table. detection_i
     result = cursor.fetchone()
 
     conn.close()
-    return result
+    if result:
+        return {
+            "id": result[0],
+            "species": result[1],
+            "filename": result[2],
+            "confidence": result[3]
+        }
+        
+
+    return None
 
 def add_result(filename,species): # (+/-) add data from model to table. to add more passed data put the traits wanted in order of the table in database 
     conn = database.get_connection()
@@ -48,7 +57,7 @@ def delete_result(detection_id):
     return deleted # will be used for streamlit to diplay message if table was deleted or not 
 
 
-# TODO create filter based on qualites 
+
 def results_by_filter(Q1,Q2):
     conn = database.get_connection()
     cursor = conn.cursor() 
@@ -94,6 +103,18 @@ def add_demo_data():
         INSERT INTO detections (species, filename, Confidence)
         VALUES (?, ?, ?)
     """, demo_data)
+
+    conn.commit()
+    conn.close()
+
+
+
+def clear_database():
+    conn = database.get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM detections")
+    cursor.execute("DELETE FROM sqlite_sequence WHERE name='detections'")
 
     conn.commit()
     conn.close()
