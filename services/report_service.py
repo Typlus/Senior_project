@@ -1,14 +1,17 @@
 import database
 from reportlab.pdfgen import canvas
-from reportlab.lib.utils import ImageReader
 from functions import get_result_by_id
+from pathlib import Path
+
+REPORT_DIR = Path(__file__).parent / "reports"
+REPORT_DIR.mkdir(exist_ok=True)
 
 fields = [
-        ("Detection ID", "id"),
-        ("Species", "species"),
-        ("Filename", "filename"),
-        ("Confidence", "confidence")
-    ]
+    ("Detection ID", "id"),
+    ("Species", "species"),
+    ("Filename", "filename"),
+    ("Confidence", "confidence")
+]
 
 
 def generate_report(detection_id):
@@ -16,11 +19,13 @@ def generate_report(detection_id):
 
     if detection is None:
         return
-    pdf = canvas.Canvas(f"report_{detection_id}.pdf")
-    pdf.setFont("Times-Roman",18)
-    pdf.drawString(100,750, "ImmersaVLM Detection Report")
 
-    
+    pdf_path = REPORT_DIR / f"report_{detection_id}.pdf"
+
+    pdf = canvas.Canvas(str(pdf_path))
+    pdf.setFont("Times-Roman", 18)
+    pdf.drawString(100, 750, "ImmersaVLM Detection Report")
+
     y = 700
     pdf.setFont("Helvetica", 12)
 
@@ -28,10 +33,17 @@ def generate_report(detection_id):
         pdf.drawString(100, y, f"{label}: {detection[key]}")
         y -= 20
 
-    image_path = f"spectrograms/{detection['filename'].replace('.wav', '.png')}"
+    image_path = (
+        Path(__file__).parent
+        / "spectrograms"
+        / detection["filename"].replace(".wav", ".jpg")
+    )
+
+    print("IMAGE PATH:", image_path)
+    print("IMAGE EXISTS:", image_path.exists())
 
     pdf.drawImage(
-        ImageReader(image_path),
+        str(image_path),
         100,
         300,
         width=400,
@@ -41,6 +53,4 @@ def generate_report(detection_id):
 
     pdf.save()
 
-import os
-
-print(os.path.exists("spectrograms/dolphin001.png"))
+    print("PDF CREATED:", pdf_path)
