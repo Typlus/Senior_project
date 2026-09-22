@@ -17,14 +17,9 @@ if st.button("Generate Report"):
         st.download_button(
             label="Download Report",
             data=pdf_data,
-            file_name=f"report_{result[0]}.pdf",
+            file_name=f"report_{result[1]}.pdf",
             mime="application/pdf"
         )
-
-
-
-
-
 
 
 # create talbe header
