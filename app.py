@@ -11,16 +11,15 @@ user_selected_c = st.slider ("what is minumum confidance level:", min_value=00, 
 
 # button to test report generation
 if st.button("Generate Report"):
-    pdf_data = reports.generate_report(result[1])
+    pdf_data = reports.generate_report(1)
 
     if pdf_data:
         st.download_button(
-            label="Download Report",
+            "Download Report",
             data=pdf_data,
-            file_name=f"report_{result[1]}.pdf",
+            file_name="report_1.pdf",
             mime="application/pdf"
         )
-
 
 # create talbe header
 st.subheader("table")
