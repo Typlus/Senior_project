@@ -10,11 +10,11 @@ user_selected_s = st.multiselect("species to filter by :",[ "Dolphin","Whale","F
 user_selected_c = st.slider ("what is minumum confidance level:", min_value=00, max_value=100 , value=0 , step=10, format="%d%%")
 
 # button to test data 
-if st.button("test data"): functions.add_demo_data()
+
 
 if st.button("test report"): reports.generate_report(1)
 
-if st.button("reset"): functions.clear_database()
+
 
 # create talbe header
 st.subheader("table")
