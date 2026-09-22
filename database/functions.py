@@ -1,56 +1,118 @@
+
 import database
-from reportlab.pdfgen import canvas
-from functions import get_result_by_id
-from pathlib import Path
-
-REPORT_DIR = Path(__file__).parent / "reports"
-REPORT_DIR.mkdir(exist_ok=True)
-
-fields = [
-    ("Detection ID", "id"),
-    ("Species", "species"),
-    ("Filename", "filename"),
-    ("Confidence", "confidence")
-]
 
 
-def generate_report(detection_id):
-    detection = get_result_by_id(detection_id)
+def get_all_results():
+    # Get all available results from the table
+    response = database.supabase.table("detections").select("*").execute()
 
-    if detection is None:
-        return
+    results = response.data
 
-    pdf_path = REPORT_DIR / f"report_{detection_id}.pdf"
+    # Return in the same order as the old SQLite SELECT *
+    return [
+        (
+            result["id"],
+            result["species"],
+            result["filename"],
+            result["confidence"]
+        )
+        for result in results
+    ]
 
-    pdf = canvas.Canvas(str(pdf_path))
-    pdf.setFont("Times-Roman", 18)
-    pdf.drawString(100, 750, "ImmersaVLM Detection Report")
 
-    y = 700
-    pdf.setFont("Helvetica", 12)
-
-    for label, key in fields:
-        pdf.drawString(100, y, f"{label}: {detection[key]}")
-        y -= 20
-
-    image_path = (
-        Path(__file__).parent
-        / "spectrograms"
-        / detection["filename"].replace(".wav", ".jpg")
+def get_result_by_id(detection_id):
+    # Get one result from the table
+    response = (
+        database.supabase
+        .table("detections")
+        .select("*")
+        .eq("id", detection_id)
+        .execute()
     )
 
-    print("IMAGE PATH:", image_path)
-    print("IMAGE EXISTS:", image_path.exists())
+    if response.data:
+        result = response.data[0]
 
-    pdf.drawImage(
-        str(image_path),
-        100,
-        300,
-        width=400,
-        height=250,
-        preserveAspectRatio=True
+        return {
+            "id": result["id"],
+            "species": result["species"],
+            "filename": result["filename"],
+            "confidence": result["confidence"]
+        }
+
+    return None
+
+
+def add_result(filename, species):
+    # Add a result to the table
+    database.supabase.table("detections").insert({
+        "filename": filename,
+        "species": species
+    }).execute()
+
+
+def delete_result(detection_id):
+    # Delete one result from the table
+    response = (
+        database.supabase
+        .table("detections")
+        .delete()
+        .eq("id", detection_id)
+        .execute()
     )
 
-    pdf.save()
+    return len(response.data)
 
-    print("PDF CREATED:", pdf_path)
+
+def results_by_filter(Q1, Q2):
+    # Filter by species and minimum confidence
+    query = (
+        database.supabase
+        .table("detections")
+        .select("*")
+        .gte("confidence", Q2)
+    )
+
+    if Q1:
+        query = query.in_("species", Q1)
+
+    response = query.execute()
+
+    return [
+        (
+            result["id"],
+            result["species"],
+            result["filename"],
+            result["confidence"]
+        )
+        for result in response.data
+    ]
+
+
+def add_demo_data():
+    # Add demo data to the table
+    demo_data = [
+        {"species": "Dolphin", "filename": "dolphin001.wav", "confidence": 95},
+        {"species": "Dolphin", "filename": "dolphin002.wav", "confidence": 82},
+        {"species": "Dolphin", "filename": "dolphin003.wav", "confidence": 67},
+        {"species": "Whale", "filename": "whale001.wav", "confidence": 91},
+        {"species": "Whale", "filename": "whale002.wav", "confidence": 76},
+        {"species": "Whale", "filename": "whale003.wav", "confidence": 54},
+        {"species": "Fish", "filename": "fish001.wav", "confidence": 88},
+        {"species": "Fish", "filename": "fish002.wav", "confidence": 72},
+        {"species": "Fish", "filename": "fish003.wav", "confidence": 43},
+        {"species": "Otter", "filename": "otter001.wav", "confidence": 96},
+        {"species": "Otter", "filename": "otter002.wav", "confidence": 81},
+        {"species": "Otter", "filename": "otter003.wav", "confidence": 62},
+        {"species": "Dolphin", "filename": "dolphin004.wav", "confidence": 74},
+        {"species": "Whale", "filename": "whale004.wav", "confidence": 69},
+        {"species": "Fish", "filename": "fish004.wav", "confidence": 97}
+    ]
+
+    database.supabase.table("detections").insert(demo_data).execute()
+
+
+def clear_database():
+    # Delete all records from the table
+    database.supabase.table("detections").delete().neq("id", 0).execute()
+
