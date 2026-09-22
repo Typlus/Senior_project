@@ -9,8 +9,7 @@ st.title ("ImmersaVLM")
 user_selected_s = st.multiselect("species to filter by :",[ "Dolphin","Whale","Fish","Otter"])
 user_selected_c = st.slider ("what is minumum confidance level:", min_value=00, max_value=100 , value=0 , step=10, format="%d%%")
 
-# button to test data 
-
+# button to test report generation
 
 if st.button("test report"): reports.generate_report(1)
 
