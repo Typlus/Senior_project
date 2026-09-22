@@ -11,7 +11,7 @@ user_selected_c = st.slider ("what is minumum confidance level:", min_value=00, 
 
 # button to test report generation
 if st.button("Generate Report"):
-    pdf_data = reports.generate_report(result[0])
+    pdf_data = reports.generate_report(result[1])
 
     if pdf_data:
         st.download_button(
