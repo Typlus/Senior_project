@@ -8,4 +8,7 @@ IMMERSANET focuses on creating a ML model to detect different animal species ins
 https://seniorproject-bexs3gvksenf44rxhfkimi.streamlit.app/#table
 
 The application servers as a way for researchers to easily view aquatic animal data from the model after inputting it. 
-streamlit, 
+
+streamlit, supabase, reportlab and ,pandas  were sued for this project
+
+setup: use the filters to display data that match that criteria. if none are edited then it will show them all. The download button at the top will allow you to download the first entry from the database without modifiers (later will add functionality to select which one)  
